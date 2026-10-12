@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+
+/* Netsworks brand overrides on top of daisyUI's stock light/dark themes. */
+@plugin "daisyui/theme" {
+  name: 'light';
+  default: true;
+  color-scheme: light;
+  --color-primary: #bd0569;
+  --color-primary-content: #ffffff;
+  --color-secondary: #185b18;
+  --color-secondary-content: #ffffff;
+  --color-accent: #685f63;
+  --color-accent-content: #ffffff;
+  --color-base-200: #e6e9ef;
+  --radius-box: 1.5rem;
+  --radius-field: 0.75rem;
+}
+
+@plugin "daisyui/theme" {
+  name: 'dark';
+  prefersdark: true;
+  color-scheme: dark;
+  --color-primary: #e64a94;
+  --color-primary-content: #1a0410;
+  --color-secondary: #3fa53f;
+  --color-secondary-content: #04140a;
+  --color-accent: #a39aa0;
+  --color-accent-content: #1a1719;
+  --radius-box: 1.5rem;
+  --radius-field: 0.75rem;
+}
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+}
+
+/* ---------------------------------------------------------------- */
+/* Fixed-header offset system (kept from the previous stylesheet).   */
+/* ---------------------------------------------------------------- */
+:root {
+  --header-height-mobile: 80px;
+  --header-height-tablet: 84px;
+  --header-height-desktop: 88px;
+}
+
+header.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: var(--header-height-mobile);
+}
+
+@media (min-width: 768px) {
+  header.site-header {
+    height: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  header.site-header {
+    height: var(--header-height-desktop);
+  }
+}
+
+body {
+  padding-top: var(--header-height-mobile);
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-top: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-top: var(--header-height-desktop);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height-mobile);
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: var(--header-height-desktop);
+  }
+}
+
+/* Mobile nav overlay: hidden off-canvas until .menu-open is toggled by ui.js. */
+.mobile-menu {
+  transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.mobile-menu.menu-open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.site-header--scrolled {
+  box-shadow: 0 1px 0 0 color-mix(in oklch, var(--color-base-content) 8%, transparent);
+}
+
+/* Brand gradient + tech-grid backdrop, used by CTA sections. */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+.tech-grid {
+  background-image: linear-gradient(rgba(189, 5, 105, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(189, 5, 105, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* <model-viewer> is a web component with no intrinsic size — it needs an
+   explicit box from its container (see ui/model-viewer.blade.php). */
+model-viewer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  --poster-color: transparent;
+}
+
+/* Hero rotator (welcome page): all slides stack in one grid cell so the
+   card never resizes between them; motion.js toggles [data-active] and
+   fades the transition. Resting state (no JS, or reduced-motion) shows
+   whichever slide the server marked active. */
+[data-hero-slide] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-hero-slide][data-active] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Entrance state for elements Anime.js reveals on scroll/load.      */
+/* motion.js removes this class once the animation has run; the      */
+/* prefers-reduced-motion branch removes it immediately on load.     */
+[data-reveal] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+  }
+}
+
+/* daisyUI's .text-rotate (Services/Capabilities hero kickers) only swaps to a
+   steppier easing under reduced motion — it still moves. This rule sits
+   outside any @layer, so it beats daisyUI's @layer utilities rule in the
+   cascade without needing !important, and actually stops the animation. */
+@media (prefers-reduced-motion: reduce) {
+  .text-rotate > * {
+    animation: none;
+  }
+}
+
+/* daisyUI's .badge sets a fixed height with display:inline-flex — a label
+   too long for that height (hero eyebrows, the welcome rotator's kickers)
+   wraps but overflows its own border instead of growing the pill. This rule
+   sits outside any @layer, so it beats daisyUI's @layer utilities rule
+   without needing !important. min-height (not a fixed height) keeps every
+   short badge — project tags, category chips — looking exactly as before. */
+.badge {
+  height: auto;
+  min-height: var(--size, 1.5rem);
+  padding-block: 0.25rem;
+}
